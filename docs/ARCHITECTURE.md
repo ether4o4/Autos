@@ -8,7 +8,7 @@
 5. The router cannot claim success from a model's text alone.
 
 ## Planned modules
-- `inference`: llama.cpp health, model discovery, chat and tool schema adapters.
+- `inference`: provider-agnostic adapter layer for local llama.cpp, OpenAI, Anthropic, Google Gemini, xAI, OpenRouter, and custom compatible APIs; capability discovery, health, model selection, cost/latency routing, fallback and tool schemas.
 - `agent`: NullClaw workspace, provider config, file and shell tools.
 - `device`: ARTEMIS Flash/Pro driver, ADB/accessibility connection, screenshot grounding.
 - `orchestrator`: intent routing, budgets, timeouts, retries, user confirmation, task journal.
@@ -23,8 +23,12 @@ User requests opening a harmless app. Router obtains permission, ARTEMIS observe
 - M1: direct Gemma chat and latency benchmark.
 - M2: NullClaw real file-write/read test.
 - M3: ARTEMIS authorized ADB and verified UI interaction.
-- M4: router linking inference and one authorized tool.
+- M4: router linking selectable local/cloud inference and one authorized tool.
 - M5: voice loop.
 - M6: Open-Mine polished front end.
 
 Status: M0 scripts authored, **not device-tested from this repository**; M1–M6 incomplete.
+
+## Provider-neutral design
+
+The assistant must never be hardwired to Gemma or any single vendor. Users select local, cloud, or hybrid policies and choose models independently for chat, coding, vision, and speech. External transmission of private context requires explicit authorization; credentials are stored locally and excluded from git. Provider adapters and their capability tests remain to be implemented.
