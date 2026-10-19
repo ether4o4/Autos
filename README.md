@@ -1,28 +1,33 @@
 # Auto OS — Autos
 
-**Android-first personal AI operating layer.** One repository for the Jarvis assistant, local inference, agent tooling, phone automation, and Open-Mine interface.
+**Android-first, provider-agnostic personal AI operating layer.** One repository for the Jarvis assistant, local inference, agent tooling, phone automation, and Open-Mine interface.
 
 > Status: **integration blueprint / work in progress**. Gemma local inference and its OpenAI-compatible endpoint have been demonstrated on a Samsung Galaxy S24 Ultra. NullClaw agent tool execution, ARTEMIS device automation, voice workflow, and end-to-end integration are **not yet verified**. This repository documents the actual state; it does not claim a finished product.
 
 ## Vision
 
-Speak or type a command → interpret intent → select an authorized tool → perform the action → verify the outcome → respond. Prefer local execution, privacy, predictable latency, and clear user control.
+Speak or type a command → interpret intent → select an authorized tool → perform the action → verify the outcome → respond. Support local, cloud, and hybrid inference with configurable privacy, cost, latency, and clear user control.
 
 ```text
 Voice / Text / Open-Mine UI
-          |
-      Auto OS router
-          |
-  +-------+---------+-----------------+
-  |                 |                 |
-Gemma local      NullClaw         ARTEMIS
-llama.cpp        tool agent       UI automation
-  |                 |                 |
-OpenAI API       Files, shell     Screen/ADB
-127.0.0.1:8080   workspace        accessibility/vision
-  +-----------------+-----------------+
-                    |
-             Verify + report
+             |
+        Auto OS router
+             |
+     Model provider adapter
+       /            \
+ Local runtimes   Cloud APIs
+ llama.cpp etc.  OpenAI, Anthropic, Google,
+                 xAI, OpenRouter, and
+                 compatible endpoints
+       \            /
+       Reasoning / vision / speech
+             |
+    Tool orchestration / permissions
+         /               \
+     NullClaw           ARTEMIS
+     Files/shell        Phone UI/ADB
+         \               /
+          Verify + report
 ```
 
 ## What exists
@@ -61,7 +66,7 @@ llama-cli -m ~/models/gemma4/Gemma-4-E2B-Uncensored-HauhauCS-Aggressive-Q4_K_P.g
 ## Architecture and responsibilities
 
 - **Auto OS router:** intent classification, model/tool selection, explicit confirmation for risky actions, retries, task state, and audit trail. Not implemented.
-- **Gemma / llama.cpp:** on-device text generation through OpenAI-compatible HTTP or direct CLI. A local model does not automatically have file or device access.
+- **Model provider adapter:** user-selectable local or hosted models, with task-based routing and fallback. Support OpenAI, Anthropic, Google Gemini, xAI Grok, OpenRouter, and custom OpenAI-compatible endpoints; add other providers through adapters. Availability and specific model features depend on each provider's API. No single model is the permanent core.\n- **Local inference:** llama.cpp/GGUF (Gemma, Qwen, and other compatible models), plus future optional local runtimes. A model does not automatically have file or device access.\n- **Cloud and hybrid inference:** configurable API credentials, model selection, privacy policy, budget limits, vision and speech capabilities, and local-first/cloud-fallback routing. Credentials remain on device, never in the repository.
 - **NullClaw:** optional tool-execution layer for files and shell, isolated workspace, tool permissions. Must prove a write/read round trip before integration.
 - **ARTEMIS:** Google mobile automation framework; Flash reactive loop and Pro plan/verify loop. Requires a working ADB/control path and compatible visual perception; a text-only GGUF alone cannot interpret screenshots.
 - **Open-Mine:** future UI, knowledge and memory library, model configuration, and task console.
@@ -95,4 +100,18 @@ docs/ARCHITECTURE.md     Milestones, boundaries, and integration contracts
 README.md               Blueprint and current status
 ```
 
-**Next integration order:** reliable Gemma chat → NullClaw tools → ARTEMIS device action → router → voice → Open-Mine UI. Keep every milestone testable before adding the next.
+**Next integration order:** reliable provider-selectable chat (local and cloud) → NullClaw tools → ARTEMIS device action → router → voice → Open-Mine UI. Keep every milestone testable before adding the next.
+
+## Provider selection (planned)
+
+| Provider | Connection | Notes |
+| --- | --- | --- |
+| Local llama.cpp | Local OpenAI-compatible endpoint | GGUF models, offline use |
+| OpenAI | Official API | Text, tools, and eligible multimodal models |
+| Anthropic | Official API | Text and tool-use models |
+| Google Gemini | Gemini API | Text and eligible multimodal models |
+| xAI Grok | xAI API | Provider-specific models and features |
+| OpenRouter | OpenRouter API | Routes across supported hosted models |
+| Custom | OpenAI-compatible base URL | Self-hosted or third-party services |
+
+Provider selection must be configurable per task (chat, coding, vision, voice, tool calling), with capability checks, cost and latency preferences, credential storage, fallback behavior, and explicit permission before sending private data to external services. **These adapters are a design requirement, not an implemented feature.**
