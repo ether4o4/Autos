@@ -1,0 +1,17 @@
+*.gguf
+*.safetensors
+*.onnx
+*.tflite
+*.pte
+.env
+.env.*
+!.env.example
+*.log
+*.key
+*.pem
+__pycache__/
+.venv/
+models/
+workspace/
+secrets/
+config.json
