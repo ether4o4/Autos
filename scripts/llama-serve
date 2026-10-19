@@ -1,0 +1,5 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+MODEL="${GEMMA_MODEL:-$HOME/models/gemma4/Gemma-4-E2B-Uncensored-HauhauCS-Aggressive-Q4_K_P.gguf}"
+if [ ! -s "$MODEL" ]; then echo "Model not found: $MODEL" >&2; exit 1; fi
+exec llama-server -m "$MODEL" --alias local-gemma --host 127.0.0.1 --port 8080 -c 16384 -t 4 -b 128 -np 1 --jinja --reasoning off
