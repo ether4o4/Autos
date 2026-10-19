@@ -1,0 +1,7 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+if ! curl -fsS --max-time 5 http://127.0.0.1:8080/health >/dev/null; then
+  echo "Server unavailable. Start llama-serve in another Termux session." >&2
+  exit 1
+fi
+exec llama-cli --server-base http://127.0.0.1:8080 --reasoning off -n 512
