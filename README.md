@@ -4,7 +4,7 @@
 
 > Status: **integration blueprint / work in progress**. Gemma local inference and its OpenAI-compatible endpoint have been demonstrated on a Samsung Galaxy S24 Ultra. NullClaw agent tool execution, ARTEMIS device automation, voice workflow, and end-to-end integration are **not yet verified**. This repository documents the actual state; it does not claim a finished product.
 
-## Vision
+**Latest checkpoint (2026-10-20):** ARTEMIS setup completed and OpenRouter was configured, but Wi-Fi-dependent wireless debugging, ADB pairing, and first UI action are pending. See [installation status](docs/STATUS.md).\n\n## Vision
 
 Speak or type a command → interpret intent → select an authorized tool → perform the action → verify the outcome → respond. Support local, cloud, and hybrid inference with configurable privacy, cost, latency, and clear user control.
 
@@ -38,7 +38,7 @@ Voice / Text / Open-Mine UI
 | Qwen 3.5 2B / 4B | CPU generation benchmarks: 21.7 / 10.0 tok/s in earlier runs | Quality and tool-call tests |
 | Qwen 2.5 Coder 3B | GGUF found in Termux | Benchmark and integration |
 | NullClaw | Installed, configured for local endpoint | `ApiError`, tool-call validation, native Android build |
-| ARTEMIS | Source cloned; `android-tools` installed | ADB connection, Python dependencies, supported vision provider, first verified tap |
+| ARTEMIS | Source cloned; uv dependency work performed; setup reported successful; OpenRouter configured in local `.env` | Confirm runtime dependencies, Wi-Fi/wireless debugging, authorized ADB connection, supported vision provider, first verified tap |
 | Open-Mine | API connection and streaming response previously observed | Message-template compatibility, tool wiring, full integration |
 | Jarvis voice | Design goal | Wake/press-to-talk, STT, TTS, permissions, interruption |
 
@@ -86,7 +86,7 @@ llama-cli -m ~/models/gemma4/Gemma-4-E2B-Uncensored-HauhauCS-Aggressive-Q4_K_P.g
 
 - NullClaw previously returned `ApiError` and `ContextLengthExceeded`; a manual `curl` response of 200 does not prove the agent path works.
 - Gemma's older GGUF chat template caused compatibility warnings; llama.cpp applied a workaround.
-- ARTEMIS ADB daemon failed to connect to TCP 5037 during initial Termux setup; package installation alone is insufficient.
+- ARTEMIS ADB daemon failed to connect to TCP 5037 during initial Termux setup. By October 20 setup reported success, but Wi-Fi was unavailable for wireless debugging; ADB and UI control remain unverified.
 - A prior Zig-based NullClaw rebuild failed due to a Linux-musl vs Android target mismatch. Avoid running opaque repair payloads.
 - A server `-c 8192` rejected requests exceeding 8,900 tokens; `-c 16384` was subsequently used, but memory and tool overhead still need testing.
 - Do not commit GGUF weights, API keys, Telegram tokens, device IDs, private memory, or logs with secrets.
