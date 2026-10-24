@@ -1,35 +1,33 @@
 # Auto OS — Installation and Integration Status
-Updated: 2026-10-20
+Updated: 2026-10-24
 
 ## Current checkpoint
-**ARTEMIS installation/setup completed; Android device control remains unverified.**
+**Wireless ADB verified on Galaxy S24 Ultra; Debian ARTEMIS runtime installation not yet proven complete.** This replaces the stale October 20 statement that Wi-Fi and ADB were unavailable.
 
-### Verified from the latest Termux session
-- ARTEMIS source lives at `/data/data/com.termux/files/home/artemis` (host path).
-- Setup displayed **"Setup completed successfully!"** and configured OpenRouter in `/data/data/com.termux/files/home/artemis/.env`.
-- During the earlier dependency install, `uv` built ARTEMIS, artemis-client and adbutils but also reported a package installation failure. Subsequent setup completed; do not infer every optional dependency and execution path is working from the setup banner.
-- The phone had no Wi-Fi connection; Android wireless debugging could not be enabled. No authorized ADB session or device UI action has been verified.
-- User left Termux at this checkpoint pending Wi-Fi.
-- `cd ..` and `cd ~` change only the current shell; `exit` leaves the current shell/ Debian environment, not other Termux sessions.
+### Verified from the October 18–20 terminal logs
+- ARTEMIS source cloned at `/data/data/com.termux/files/home/artemis`.
+- Termux: Python 3.14.6, `uv 0.13.1` (aarch64-linux-android), and `android-tools` installed.
+- `uv sync --dry-run --no-dev --no-managed-python` resolved 196 packages and proposed 175 installations. **Resolution is not proof of installation.**
+- Wireless ADB paired successfully on the same phone. `adb connect 127.0.0.1:37553` reported connected; `adb devices -l` reported `device`; `adb shell getprop ro.product.model` returned `SM-S928U`. That port was temporary and may have changed.
+- Debian 13 (Trixie) via `proot-distro` exists on ARM64. Debian Python 3.13.5, Git, curl, ADB, FFmpeg, Python venv/pip and build-essential finished installing.
+- Debian `apt install uv` returned “Unable to locate package uv”; fallback virtualenv/pip installation began. Its successful completion is **not established** by the provided output.
+- Previous session reported ARTEMIS setup completion and OpenRouter configuration; CLI, dependency health and first actual ARTEMIS UI action are not independently verified.
 
-### Previously demonstrated (not retested at this checkpoint)
-- llama.cpp served a local GGUF via an OpenAI-compatible endpoint.
-- Gemma 4 E2B and Qwen local model tests were performed.
-- NullClaw and Open-Mine integrations still have unresolved tool/UI issues.
+### Next steps (inside Debian)
+1. Enter Debian from Termux: `proot-distro login debian`.
+2. Check `uv --version`; if absent, create `/root/uv-env`, install uv with its pip, and symlink the executable to `/usr/local/bin/uv`.
+3. Prefer a separate Debian checkout of `google/artemis` under `/root/artemis` rather than sharing a Termux `.venv`. Preserve existing source/configuration; never commit local `.env` or keys.
+4. From the Debian checkout run `uv sync --dry-run --no-dev --no-managed-python`, then `uv sync --no-dev --no-managed-python` if resolution succeeds. Record first failure rather than retrying blindly.
+5. In Settings → Developer options → Wireless debugging, read the current main debugging port. From Debian connect `adb connect 127.0.0.1:CURRENT_PORT`; verify `adb devices -l` and `adb shell getprop ro.product.model`. Debian's ADB server may need pairing separately.
+6. Check `uv run --no-sync artemis --help` and configured vision provider (without revealing credentials).
+7. Run a harmless task such as opening Settings, verify the actual on-device result, and only then mark Auto OS ARTEMIS milestone M3 complete.
 
-## Resume when Wi-Fi is available
-1. Connect phone to Wi-Fi and enable Developer options → Wireless debugging.
-2. Establish and verify ADB pairing/connection using the available Termux/ARTEMIS environment. Do not assume Android shell, Debian proot and Termux share paths or binaries.
-3. Confirm `adb devices -l` lists an authorized device.
-4. From the existing ARTEMIS checkout, inspect the actual installed CLI and available providers; run a non-destructive observation task before attempting any UI interaction.
-5. Verify one harmless tap or navigation action and capture the result.
-6. Only then wire ARTEMIS into Auto OS router/Open-Mine.
+### Open integration items
+- Confirm all Python native dependencies on Debian ARM64, CLI launch and model configuration.
+- Verify ARTEMIS observation, one authorized UI action and its outcome.
+- Implement provider-selectable routing, NullClaw tool validation, voice, and Open-Mine UI integration.
+- Do not commit `.env`, API keys, GGUFs, private logs, device IDs, or personal data.
 
-## Remaining work
-- Test ARTEMIS launch and full dependency health after setup.
-- Confirm API credentials without printing or committing secrets.
-- Validate ADB transport, vision model support and action verification.
-- Add selectable provider adapters for local llama.cpp, OpenAI, Anthropic, Gemini, xAI, OpenRouter and custom endpoints.
-- Validate NullClaw tools and Open-Mine backend integration.
-
-**Do not commit** `.env`, credentials, device identifiers, local memory, model weights, or private logs.
+## Upstream
+Google ARTEMIS: https://github.com/google/artemis
+Most recent upstream commit returned by connected GitHub search: `351ca8422f7b5b54e80a9c1ce03a222e02415b6b` (2026-09-29). This status document is an integration checkpoint, **not a vendor-source mirror or upstream code sync**.
